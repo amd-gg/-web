@@ -1,0 +1,125 @@
+:root{
+  --bg:#f7f7fb;
+  --card:#fff;
+  --text:#222;
+  --muted:#6b7280;
+  --brand:#2563eb;
+  --brand-600:#1d4ed8;
+  --danger:#ef4444;
+  --ok:#16a34a;
+  --line:#e5e7eb;
+  --shadow:0 6px 24px rgba(0,0,0,.08);
+  --radius:14px;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,Apple Color Emoji,Segoe UI Emoji;
+  background:var(--bg);
+  color:var(--text);
+}
+
+/* Header */
+.app-header{
+  display:flex; gap:16px; align-items:center; justify-content:space-between;
+  padding:12px 16px; background:#fff; border-bottom:1px solid var(--line);
+  position:sticky; top:0; z-index:10;
+}
+.brand{display:flex; align-items:center; gap:8px; user-select:none}
+.brand .logo{font-size:22px}
+.brand .title{font-weight:700}
+.searchbar{flex:1; display:flex; gap:8px; max-width:720px; margin:0 12px}
+.searchbar input{flex:1; padding:10px 12px; border:1px solid var(--line); border-radius:10px; outline:none}
+.header-actions{display:flex; gap:8px}
+
+/* Tabs */
+.tabs{display:flex; gap:8px; padding:8px 16px; background:#fff; position:sticky; top:56px; z-index:9; border-bottom:1px solid var(--line)}
+.tab{
+  border:none; background:#f1f5f9; padding:8px 12px; border-radius:999px; cursor:pointer; color:#374151
+}
+.tab.active{background:var(--brand); color:#fff}
+
+/* Common */
+.btn{
+  border:none; background:var(--brand); color:#fff; padding:8px 12px; border-radius:10px; cursor:pointer;
+}
+.btn:hover{background:var(--brand-600)}
+.btn-ghost{background:transparent; color:var(--brand)}
+.link{background:transparent; border:none; color:var(--brand); cursor:pointer; padding:0 6px}
+.row{display:flex; align-items:center}
+.between{justify-content:space-between}
+.gap{gap:8px}
+.small{font-size:12px}
+.muted{color:var(--muted)}
+hr{border:none; border-top:1px solid var(--line); margin:12px 0}
+
+.card{
+  background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:16px; box-shadow:var(--shadow)
+}
+.field{display:flex; flex-direction:column; gap:6px; margin:8px 0}
+.field input, .field textarea, .field select{
+  width:100%; padding:10px 12px; border:1px solid var(--line); border-radius:10px; outline:none; background:#fff;
+}
+.field textarea{min-height:110px; resize:vertical}
+.captcha-row{align-items:flex-end}
+.captcha{
+  user-select:none; font-weight:700; letter-spacing:4px; background:#0ea5e9; color:#fff;
+  padding:6px 10px; border-radius:8px; box-shadow:inset 0 0 12px rgba(0,0,0,.2)
+}
+
+/* Views */
+#view{max-width:960px; margin:16px auto; padding:0 12px}
+.list{display:grid; grid-template-columns:repeat(1,minmax(0,1fr)); gap:12px}
+@media (min-width:720px){ .list{grid-template-columns:repeat(2,minmax(0,1fr))} }
+
+.post-card .meta{display:flex; flex-wrap:wrap; gap:10px; color:var(--muted); font-size:12px}
+.post-card .title{font-weight:700; font-size:16px}
+.badge{
+  display:inline-block; padding:2px 8px; border-radius:999px; font-size:12px; color:#fff;
+}
+.badge.found{background:var(--ok)}
+.badge.lost{background:var(--danger)}
+.cover{width:100%; border-radius:12px; margin-top:8px; object-fit:cover; max-height:220px}
+
+.actions{display:flex; gap:8px; margin-top:8px}
+
+/* Detail */
+.detail .header{display:flex; flex-direction:column; gap:8px}
+.detail .content{white-space:pre-wrap; line-height:1.6}
+.kv{display:flex; gap:8px; flex-wrap:wrap; color:#374151; font-size:14px}
+.kv b{color:#111827}
+
+/* Publish */
+.form-tip{font-size:12px; color:var(--muted)}
+
+/* Comments */
+.comments{margin-top:12px}
+.comment{padding:8px 0; border-bottom:1px dashed var(--line)}
+.comment .who{font-weight:600; margin-right:6px}
+
+/* Chat */
+dialog{border:none; padding:0}
+dialog::backdrop{background:rgba(0,0,0,.2)}
+dialog form{min-width:min(680px,94vw)}
+.chat-list{
+  border:1px solid var(--line); border-radius:12px; min-height:220px; max-height:420px; overflow:auto;
+  padding:8px; background:#fff;
+}
+.msg{display:flex; margin:6px 0}
+.msg .bubble{padding:8px 10px; border-radius:12px; max-width:70%}
+.msg.me{justify-content:flex-end}
+.msg.me .bubble{background:#dbeafe}
+.msg.other .bubble{background:#f3f4f6}
+
+/* FAB */
+.fab{
+  position:fixed; right:16px; bottom:16px; width:56px; height:56px; border-radius:50%;
+  display:grid; place-items:center; font-size:22px; background:var(--brand); color:#fff; border:none; box-shadow:var(--shadow); cursor:pointer;
+}
+@media (min-width:920px){ .fab{display:none} }
+
+/* Utilities */
+.empty{padding:24px; text-align:center; color:var(--muted)}
+.pointer{cursor:pointer}

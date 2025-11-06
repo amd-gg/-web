@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>校园失物招领系统</title>
+  <link rel="stylesheet" href="./styles.css" />
+  <script defer src="./app.js"></script>
+</head>
+<body>
+  <header class="app-header">
+    <div class="brand" role="button" tabindex="0" onclick="Router.go('/')">
+      <span class="logo">🎒</span>
+      <span class="title">校园失物招领系统</span>
+    </div>
+
+    <div class="searchbar">
+      <input id="searchInput" type="search" placeholder="搜索标题/内容/地点（支持模糊查询）" />
+      <button class="btn" id="searchBtn" title="搜索">搜索</button>
+    </div>
+
+    <div class="header-actions">
+      <button class="btn btn-ghost" id="publishBtn" title="发布">发布</button>
+      <button class="btn" id="loginEntryBtn" title="登录或个人中心">登录</button>
+    </div>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="类型筛选">
+    <button class="tab active" data-type="all">全部</button>
+    <button class="tab" data-type="found">失物招领（发现）</button>
+    <button class="tab" data-type="lost">寻物启事（求助）</button>
+  </nav>
+
+  <main id="view"></main>
+
+  <!-- 登录/注册 模态框 -->
+  <dialog id="authDialog">
+    <form class="card" method="dialog" id="authForm">
+      <h3 id="authTitle">登录</h3>
+
+      <div class="field">
+        <label>用户名</label>
+        <input name="username" autocomplete="username" required />
+      </div>
+
+      <div class="field">
+        <label>密码</label>
+        <input name="password" type="password" autocomplete="current-password" required />
+      </div>
+
+      <div class="field captcha-row">
+        <label>验证码</label>
+        <input name="captcha" placeholder="输入右侧验证码" required />
+        <span id="captchaText" class="captcha" role="img" aria-label="验证码"></span>
+        <button type="button" class="link" id="refreshCaptcha">换一张</button>
+      </div>
+
+      <div class="row gap">
+        <button class="btn" id="authSubmit" value="default">登录</button>
+        <button class="btn btn-ghost" id="toRegister" type="button">去注册</button>
+        <button class="btn btn-ghost" id="toReset" type="button">忘记密码</button>
+        <button class="btn" value="cancel">取消</button>
+      </div>
+
+      <hr />
+
+      <div id="registerPanel" hidden>
+        <div class="field">
+          <label>设置密码</label>
+          <input name="reg_password" type="password" autocomplete="new-password" />
+        </div>
+        <div class="field">
+          <label>微信号（用于找回密码与私聊展示）</label>
+          <input name="reg_wechat" />
+        </div>
+        <div class="row gap">
+          <button type="button" class="btn" id="registerSubmit">提交注册</button>
+          <button type="button" class="btn btn-ghost" id="backToLogin">返回登录</button>
+        </div>
+      </div>
+
+      <div id="resetPanel" hidden>
+        <p class="muted">通过“用户名 + 微信号”重置密码</p>
+        <div class="field">
+          <label>新密码</label>
+          <input name="reset_password" type="password" />
+        </div>
+        <div class="field">
+          <label>微信号</label>
+          <input name="reset_wechat" />
+        </div>
+        <div class="row gap">
+          <button type="button" class="btn" id="resetSubmit">确认重置</button>
+          <button type="button" class="btn btn-ghost" id="backToLogin2">返回登录</button>
+        </div>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- 私聊 模态框 -->
+  <dialog id="chatDialog">
+    <form class="card" method="dialog">
+      <div class="row between">
+        <h3>私聊</h3>
+        <button class="btn btn-ghost" value="cancel">关闭</button>
+      </div>
+      <div id="chatMeta" class="muted small"></div>
+      <div id="chatList" class="chat-list" aria-live="polite"></div>
+      <div class="row gap">
+        <input id="chatInput" placeholder="输入消息..." />
+        <button id="chatSendBtn" type="button" class="btn">发送</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- 浮动发布按钮（移动端） -->
+  <button id="fabPublish" class="fab" title="发布">＋</button>
+</body>
+</html>
