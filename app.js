@@ -148,20 +148,20 @@ const Store = {
 const qs = (sel,root=document)=>root.querySelector(sel);
 const qsa = (sel,root=document)=>Array.from(root.querySelectorAll(sel));
 
-// 关键修复：始终使用 "#/..." 形式；即便 hash 未变也强制渲染一次
+// 关键修复：Router.go 始终生成 "#/..."，hash 未变化也强制渲染
 const Router = {
   go(path){
     const newHash = '#' + (path.startsWith('/') ? path : '/' + path);
     const same = location.hash === newHash;
     location.hash = newHash;
     if (same) App.render();
-    return location.hash; // 便于在 Console 里看到结果
+    return location.hash; // 便于在 Console 查看结果
   },
   onChange(){ App.render(); }
 };
 
 window.addEventListener('hashchange', Router.onChange);
-window.addEventListener('load', Router.onChange); // 兜底：初始/刷新后也触发一次
+window.addEventListener('load', Router.onChange); // 首次加载兜底
 
 // ===== App 入口与事件 =====
 const App = {
@@ -186,7 +186,7 @@ const App = {
       });
     });
 
-    // 双保险：点击后立即渲染一次
+    // 双保险：点击后立即渲染
     const goPublish = ()=>{ Router.go('/publish'); App.render(); };
     qs('#publishBtn').addEventListener('click', goPublish);
     qs('#fabPublish').addEventListener('click', goPublish);
@@ -208,7 +208,7 @@ const App = {
     const me = Auth.me();
     qs('#loginEntryBtn').textContent = me ? '我的' : '登录';
 
-    // 关键修复：容错没有斜杠的 hash（如 #publish），自动补成 /publish
+    // 规范化 hash：兼容 "#publish" → "/publish"
     const raw = location.hash.replace(/^#/, '');
     const hash = raw.startsWith('/') ? raw : '/' + raw;
 
