@@ -1,0 +1,1 @@
+{\n  "name": "lost-found-api",\n  "version": "1.0.0",\n  "private": true,\n  "type": "module",\n  "main": "index.js",\n  "scripts": {\n    "start": "node index.js",\n    "dev": "node index.js"\n  },\n  "dependencies": {\n    "better-sqlite3": "^9.6.0",\n    "bcryptjs": "^2.4.3",\n    "cors": "^2.8.5",\n    "express": "^4.19.2",\n    "jsonwebtoken": "^9.0.2"\n  }\n}
