@@ -445,6 +445,10 @@ function escapeHTML(str=''){
 // ===== Auth 对话框逻辑 =====
 function wireAuthDialog(){
   const dialog = qs('#authDialog');
+   const cancelBtn = document.getElementById('authCancel');
+  if (cancelBtn) {
+    cancelBtn.addEventListener('click', () => dialog.close('cancel'));
+  }
   const captchaText = qs('#captchaText');
   const refresh = ()=> captchaText.textContent = randomCaptcha();
   refresh();
