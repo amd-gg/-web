@@ -148,12 +148,14 @@ const Store = {
 const qs = (sel,root=document)=>root.querySelector(sel);
 const qsa = (sel,root=document)=>Array.from(root.querySelectorAll(sel));
 
+// 关键修复：始终使用 "#/..." 形式；即便 hash 未变也强制渲染一次
 const Router = {
   go(path){
-    const newHash = '#' + (path.startsWith('/')?path.slice(1):path);
+    const newHash = '#' + (path.startsWith('/') ? path : '/' + path);
     const same = location.hash === newHash;
     location.hash = newHash;
-    if (same) App.render(); // 兜底：hash 未变化时也强制渲染
+    if (same) App.render();
+    return location.hash; // 便于在 Console 里看到结果
   },
   onChange(){ App.render(); }
 };
@@ -184,7 +186,8 @@ const App = {
       });
     });
 
-    const goPublish = ()=>{ Router.go('/publish'); App.render(); }; // 双保险：立即渲染
+    // 双保险：点击后立即渲染一次
+    const goPublish = ()=>{ Router.go('/publish'); App.render(); };
     qs('#publishBtn').addEventListener('click', goPublish);
     qs('#fabPublish').addEventListener('click', goPublish);
 
@@ -205,7 +208,10 @@ const App = {
     const me = Auth.me();
     qs('#loginEntryBtn').textContent = me ? '我的' : '登录';
 
-    const hash = location.hash.replace(/^#/, '');
+    // 关键修复：容错没有斜杠的 hash（如 #publish），自动补成 /publish
+    const raw = location.hash.replace(/^#/, '');
+    const hash = raw.startsWith('/') ? raw : '/' + raw;
+
     if (!hash || hash === '/') {
       this.renderList();
       return;
@@ -229,7 +235,7 @@ const App = {
     `;
     view.innerHTML = html;
 
-    // Bind click
+    // 双保险：点击卡片后立即渲染
     qsa('[data-post-id]').forEach(el=>{
       el.addEventListener('click', ()=> { Router.go('/post/'+ el.dataset.postId); App.render(); });
     });
