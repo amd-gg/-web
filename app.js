@@ -149,11 +149,17 @@ const qs = (sel,root=document)=>root.querySelector(sel);
 const qsa = (sel,root=document)=>Array.from(root.querySelectorAll(sel));
 
 const Router = {
-  go(path){ location.hash = '#' + (path.startsWith('/')?path.slice(1):path); },
+  go(path){
+    const newHash = '#' + (path.startsWith('/')?path.slice(1):path);
+    const same = location.hash === newHash;
+    location.hash = newHash;
+    if (same) App.render(); // 兜底：hash 未变化时也强制渲染
+  },
   onChange(){ App.render(); }
 };
 
 window.addEventListener('hashchange', Router.onChange);
+window.addEventListener('load', Router.onChange); // 兜底：初始/刷新后也触发一次
 
 // ===== App 入口与事件 =====
 const App = {
@@ -178,7 +184,7 @@ const App = {
       });
     });
 
-    const goPublish = ()=>Router.go('/publish');
+    const goPublish = ()=>{ Router.go('/publish'); App.render(); }; // 双保险：立即渲染
     qs('#publishBtn').addEventListener('click', goPublish);
     qs('#fabPublish').addEventListener('click', goPublish);
 
@@ -225,7 +231,7 @@ const App = {
 
     // Bind click
     qsa('[data-post-id]').forEach(el=>{
-      el.addEventListener('click', ()=> Router.go('/post/'+ el.dataset.postId));
+      el.addEventListener('click', ()=> { Router.go('/post/'+ el.dataset.postId); App.render(); });
     });
   },
 
@@ -445,10 +451,9 @@ function escapeHTML(str=''){
 // ===== Auth 对话框逻辑 =====
 function wireAuthDialog(){
   const dialog = qs('#authDialog');
-   const cancelBtn = document.getElementById('authCancel');
-  if (cancelBtn) {
-    cancelBtn.addEventListener('click', () => dialog.close('cancel'));
-  }
+  const cancelBtn = document.getElementById('authCancel');
+  if (cancelBtn) cancelBtn.addEventListener('click', () => dialog.close('cancel'));
+
   const captchaText = qs('#captchaText');
   const refresh = ()=> captchaText.textContent = randomCaptcha();
   refresh();
