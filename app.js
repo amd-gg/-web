@@ -171,10 +171,17 @@ const App = {
     // Header actions
     qs('#searchBtn').addEventListener('click', ()=>{
       this.state.query = qs('#searchInput').value || '';
+      Autocomplete.saveSearch(this.state.query); // Save to history
       this.renderList();
     });
     qs('#searchInput').addEventListener('keydown', (e)=>{
       if(e.key==='Enter'){ qs('#searchBtn').click(); }
+    });
+
+    // Add autocomplete to search input
+    Autocomplete.create(qs('#searchInput'), (query) => {
+      const history = Autocomplete.getSearchHistory();
+      return history.filter(h => h.toLowerCase().includes(query.toLowerCase()));
     });
 
     qsa('.tab').forEach(btn=>{
@@ -293,6 +300,13 @@ const App = {
       const pv = qs('#f_preview');
       pv.src = b64; pv.style.display='block';
       pv.dataset.b64 = b64;
+    });
+
+    // Add autocomplete to place input
+    Autocomplete.create(qs('#f_place'), (query) => {
+      return Autocomplete.campusLocations.filter(loc => 
+        loc.toLowerCase().includes(query.toLowerCase())
+      );
     });
 
     qs('#publishSubmit').addEventListener('click', ()=>{
@@ -434,6 +448,147 @@ function CommentsList(postId){
     `;
   }).join('');
 }
+
+// ===== Autocomplete Component =====
+const Autocomplete = {
+  // Common campus locations for place autocomplete
+  campusLocations: [
+    '图书馆一楼', '图书馆二楼', '图书馆三楼',
+    '教学楼A座', '教学楼B座', '教学楼C座',
+    '自习室', '实验室',
+    '操场', '操场看台', '篮球场', '足球场',
+    '食堂', '第一食堂', '第二食堂',
+    '宿舍楼', '东门', '西门', '南门', '北门',
+    '体育馆', '游泳馆', '学生活动中心',
+    '校医院', '超市', '快递站'
+  ],
+
+  // Get search history from localStorage
+  getSearchHistory() {
+    const history = localStorage.getItem('search_history');
+    return history ? JSON.parse(history) : [];
+  },
+
+  // Save search to history
+  saveSearch(query) {
+    if (!query || query.trim().length === 0) return;
+    const history = this.getSearchHistory();
+    // Remove if exists and add to beginning
+    const filtered = history.filter(q => q !== query);
+    filtered.unshift(query);
+    // Keep only last 10 searches
+    const limited = filtered.slice(0, 10);
+    localStorage.setItem('search_history', JSON.stringify(limited));
+  },
+
+  // Create autocomplete dropdown
+  create(input, getSuggestions) {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'autocomplete-wrapper';
+    wrapper.style.position = 'relative';
+    
+    const dropdown = document.createElement('div');
+    dropdown.className = 'autocomplete-dropdown';
+    dropdown.style.display = 'none';
+    
+    // Replace input with wrapper
+    input.parentNode.insertBefore(wrapper, input);
+    wrapper.appendChild(input);
+    wrapper.appendChild(dropdown);
+
+    let currentFocus = -1;
+
+    const showSuggestions = (suggestions) => {
+      dropdown.innerHTML = '';
+      if (suggestions.length === 0) {
+        dropdown.style.display = 'none';
+        return;
+      }
+
+      suggestions.forEach((suggestion, index) => {
+        const item = document.createElement('div');
+        item.className = 'autocomplete-item';
+        item.textContent = suggestion;
+        item.addEventListener('click', () => {
+          input.value = suggestion;
+          dropdown.style.display = 'none';
+          input.focus();
+        });
+        dropdown.appendChild(item);
+      });
+
+      dropdown.style.display = 'block';
+      currentFocus = -1;
+    };
+
+    const filterSuggestions = () => {
+      const value = input.value.toLowerCase();
+      if (!value) {
+        dropdown.style.display = 'none';
+        return;
+      }
+      const suggestions = getSuggestions(value);
+      showSuggestions(suggestions);
+    };
+
+    const removeActive = () => {
+      const items = dropdown.querySelectorAll('.autocomplete-item');
+      items.forEach(item => item.classList.remove('autocomplete-active'));
+    };
+
+    const addActive = () => {
+      const items = dropdown.querySelectorAll('.autocomplete-item');
+      if (!items || items.length === 0) return;
+      removeActive();
+      if (currentFocus >= items.length) currentFocus = 0;
+      if (currentFocus < 0) currentFocus = items.length - 1;
+      items[currentFocus].classList.add('autocomplete-active');
+    };
+
+    input.addEventListener('input', filterSuggestions);
+    
+    input.addEventListener('focus', () => {
+      if (input.value) {
+        filterSuggestions();
+      } else {
+        // Show all suggestions on focus if empty
+        const suggestions = getSuggestions('');
+        if (suggestions.length > 0) {
+          showSuggestions(suggestions.slice(0, 8));
+        }
+      }
+    });
+
+    input.addEventListener('keydown', (e) => {
+      const items = dropdown.querySelectorAll('.autocomplete-item');
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        currentFocus++;
+        addActive();
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        currentFocus--;
+        addActive();
+      } else if (e.key === 'Enter') {
+        if (currentFocus > -1 && items[currentFocus]) {
+          e.preventDefault();
+          items[currentFocus].click();
+        }
+      } else if (e.key === 'Escape') {
+        dropdown.style.display = 'none';
+      }
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!wrapper.contains(e.target)) {
+        dropdown.style.display = 'none';
+      }
+    });
+
+    return { destroy: () => wrapper.remove() };
+  }
+};
 
 // ===== 工具 UI：验证码、图片转base64、转义 =====
 function randomCaptcha(){
