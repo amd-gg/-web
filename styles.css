@@ -123,3 +123,29 @@ dialog form{min-width:min(680px,94vw)}
 /* Utilities */
 .empty{padding:24px; text-align:center; color:var(--muted)}
 .pointer{cursor:pointer}
+
+/* Autocomplete */
+.autocomplete-wrapper{
+  position:relative; width:100%;
+}
+.autocomplete-dropdown{
+  position:absolute; top:100%; left:0; right:0;
+  background:var(--card); border:1px solid var(--line);
+  border-radius:10px; box-shadow:var(--shadow);
+  max-height:240px; overflow-y:auto;
+  z-index:1000; margin-top:4px;
+}
+.autocomplete-item{
+  padding:10px 12px; cursor:pointer;
+  transition:background 0.15s ease;
+}
+.autocomplete-item:hover,
+.autocomplete-item.autocomplete-active{
+  background:#f3f4f6;
+}
+.autocomplete-item:first-child{
+  border-radius:10px 10px 0 0;
+}
+.autocomplete-item:last-child{
+  border-radius:0 0 10px 10px;
+}
